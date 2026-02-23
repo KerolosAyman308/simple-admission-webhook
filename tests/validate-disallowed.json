@@ -1,0 +1,21 @@
+{
+    "request": {
+        "uid": "12345-67890",
+        "userInfo": {
+            "username": "admin"
+        },
+        "object": {
+            "metadata": {
+                "name": "admin",
+                "kind": "Pod"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "name": "forbidden-pod"
+                    }
+                ]
+            }
+        }
+    }
+}

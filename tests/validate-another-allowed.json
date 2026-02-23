@@ -1,0 +1,21 @@
+{
+    "request": {
+        "uid": "abcde-12345",
+        "userInfo": {
+            "username": "developer"
+        },
+        "object": {
+            "metadata": {
+                "name": "frontend-app",
+                "kind": "Pod"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "name": "react-app"
+                    }
+                ]
+            }
+        }
+    }
+}

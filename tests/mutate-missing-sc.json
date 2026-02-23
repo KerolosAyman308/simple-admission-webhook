@@ -1,0 +1,21 @@
+{
+    "request": {
+        "uid": "mutate-uid-1",
+        "userInfo": {
+            "username": "admin"
+        },
+        "object": {
+            "metadata": {
+                "name": "mutate-pod-1",
+                "kind": "Pod"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "name": "worker"
+                    }
+                ]
+            }
+        }
+    }
+}
