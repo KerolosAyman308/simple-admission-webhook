@@ -1,0 +1,41 @@
+apiVersion: apps/v1    
+kind: Deployment       
+metadata:
+  labels:
+    app: simple-webhook-deploy
+  name: simple-webhook-deploy
+  namespace: simple-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-webhook-deploy
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: simple-webhook-deploy
+    spec:
+      volumes:
+      - name: nginxCerts
+        secretName:
+          name: webhook-tls
+      - name: nginxConf
+        configMap:
+          name: webhook-proxy-cm
+      containers:
+      - image: nginx:alpine
+        name: proxy
+        volumeMounts:
+          - mountPath: /etc/nginx
+            name: nginxConf
+          - mountPath: /etc/pki/
+            name: nginxCerts
+            readOnly: true
+      - image: kerolosayman308/golang:simple-admission-webhook
+        name: golang
+        resources: 
+          requests:
+            memory: 50Mi
+            cpu: "0.5"
