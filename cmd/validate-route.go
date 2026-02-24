@@ -12,9 +12,13 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 	var admissionReview internals.AdmissionReview
 	err := json.NewDecoder(r.Body).Decode(&admissionReview)
 	if err != nil {
-		json.NewEncoder(w).Encode(internals.AdmissionResponse{
-			Allowed: false,
-			Status:  internals.AdmissionStatus{Message: "Invalid JSON: " + err.Error()},
+		json.NewEncoder(w).Encode(internals.AdmissionReviewResponse{
+			APIVersion: "admission.k8s.io/v1",
+			Kind:       "AdmissionReview",
+			Response: &internals.AdmissionResponse{
+				Allowed: false,
+				Status:  &internals.AdmissionStatus{Message: "Invalid JSON: " + err.Error()},
+			},
 		})
 		return
 	}
@@ -33,9 +37,13 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		Message: message,
 	}
 
-	json.NewEncoder(w).Encode(internals.AdmissionResponse{
-		UID:     admissionReview.Request.UID,
-		Allowed: status,
-		Status:  statusObj,
+	json.NewEncoder(w).Encode(internals.AdmissionReviewResponse{
+		APIVersion: "admission.k8s.io/v1",
+		Kind:       "AdmissionReview",
+		Response: &internals.AdmissionResponse{
+			UID:     admissionReview.Request.UID,
+			Allowed: status,
+			Status:  &statusObj,
+		},
 	})
 }

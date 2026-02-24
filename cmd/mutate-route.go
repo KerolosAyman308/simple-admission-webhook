@@ -12,9 +12,13 @@ func Mutate(w http.ResponseWriter, r *http.Request) {
 	var admissionReview internals.AdmissionReview
 	err := json.NewDecoder(r.Body).Decode(&admissionReview)
 	if err != nil {
-		json.NewEncoder(w).Encode(internals.AdmissionResponse{
-			Allowed: false,
-			Status:  internals.AdmissionStatus{Message: "Invalid JSON: " + err.Error()},
+		json.NewEncoder(w).Encode(internals.AdmissionReviewResponse{
+			APIVersion: "admission.k8s.io/v1",
+			Kind:       "AdmissionReview",
+			Response: &internals.AdmissionResponse{
+				Allowed: false,
+				Status:  &internals.AdmissionStatus{Message: "Invalid JSON: " + err.Error()},
+			},
 		})
 		return
 	}
@@ -22,10 +26,14 @@ func Mutate(w http.ResponseWriter, r *http.Request) {
 	objectContainers := admissionReview.Request.Object.Spec.Containers
 	if len(objectContainers) == 0 {
 		println("Failed to parse containers from request")
-		json.NewEncoder(w).Encode(internals.AdmissionResponse{
-			UID:     admissionReview.Request.UID,
-			Allowed: false,
-			Status:  internals.AdmissionStatus{Message: "Failed to parse containers from request"},
+		json.NewEncoder(w).Encode(internals.AdmissionReviewResponse{
+			APIVersion: "admission.k8s.io/v1",
+			Kind:       "AdmissionReview",
+			Response: &internals.AdmissionResponse{
+				UID:     admissionReview.Request.UID,
+				Allowed: false,
+				Status:  &internals.AdmissionStatus{Message: "Failed to parse containers from request"},
+			},
 		})
 		return
 	}
@@ -61,11 +69,15 @@ func Mutate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	response := internals.AdmissionMutateResponse{
-		UID:       admissionReview.Request.UID,
-		Allowed:   allowed,
-		Patch:     patchString,
-		PatchType: patchType,
+	response := internals.AdmissionReviewResponse{
+		APIVersion: "admission.k8s.io/v1",
+		Kind:       "AdmissionReview",
+		Response: &internals.AdmissionResponse{
+			UID:       admissionReview.Request.UID,
+			Allowed:   allowed,
+			Patch:     patchString,
+			PatchType: patchType,
+		},
 	}
 
 	json.NewEncoder(w).Encode(response)
