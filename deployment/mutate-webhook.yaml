@@ -7,12 +7,12 @@ webhooks:
     admissionReviewVersions: ["v1"]
     sideEffects: None
     timeoutSeconds: 5
-    failurePolicy: Fail 
+    failurePolicy: Ignore 
     clientConfig:
       service:
         name: simple-webhook-svc
         namespace: simple-webhook
-        path: "/mutate"
+        path: "/api/mutate"
         port: 443
       caBundle: GENERATE_WITH_run.sh
     rules:

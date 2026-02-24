@@ -1,5 +1,8 @@
 baseDir=/etc/simple-webhook/pki
 mkdir -p $baseDir
+
+kubectl apply -f ns.yaml
+
 #Generate the webhook admission ca key
 openssl genrsa -out $baseDir/ca.key 2048
 
@@ -10,7 +13,12 @@ openssl x509 -req -in $baseDir/ca.csr -signkey $baseDir/ca.key -out $baseDir/ca.
 #generate server cert
 openssl genrsa -out $baseDir/server.key 2048
 openssl req -new -key $baseDir/server.key -subj "/CN=simple-webhook-svc.simple-webhook.svc" -out $baseDir/server.csr 
-openssl x509 -req -in $baseDir/server.csr -CAkey $baseDir/ca.key -CA $baseDir/ca.crt -out $baseDir/server.crt
+#openssl x509 -req -in $baseDir/server.csr -CAkey $baseDir/ca.key -CA $baseDir/ca.crt -out $baseDir/server.crt
+openssl x509 -req -in "$baseDir/server.csr" \
+  -CA "$baseDir/ca.crt" -CAkey "$baseDir/ca.key" -CAcreateserial \
+  -out "$baseDir/server.crt"  \
+  -extfile san.cnf \
+  -extensions v3_req
 
 ## Check if the secret already exist and delete it 
 secretCount=$(kubectl get secret webhook-tls -n simple-webhook --no-headers | wc -l)
@@ -25,5 +33,4 @@ sed -i "s/.*caBundle:.*/      caBundle: $caBase64/" mutate-webhook.yaml
 sed -i "s/.*caBundle:.*/      caBundle: $caBase64/" validate-webhook.yaml
 
 ## Create this first so rest of objects dont complain
-k apply -f ns.yaml
 kubectl apply -f ./
