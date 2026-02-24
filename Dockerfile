@@ -14,8 +14,8 @@ RUN go build -o /build/app ./cmd
 FROM alpine:3.23 AS final
 WORKDIR /app
 
-COPY --from=builder /build/app /bin/app
+COPY --from=builder /build/app ./app
 
 EXPOSE 8000
 
-CMD ["bin/app"]
+CMD ["./app"]

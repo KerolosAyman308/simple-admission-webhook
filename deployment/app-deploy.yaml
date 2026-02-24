@@ -18,10 +18,10 @@ spec:
         app: simple-webhook-deploy
     spec:
       volumes:
-      - name: nginxCerts
-        secretName:
-          name: webhook-tls
-      - name: nginxConf
+      - name: nginx-certs
+        secret:
+          secretName: webhook-tls
+      - name: nginx-conf
         configMap:
           name: webhook-proxy-cm
       containers:
@@ -29,11 +29,11 @@ spec:
         name: proxy
         volumeMounts:
           - mountPath: /etc/nginx
-            name: nginxConf
+            name: nginx-conf
           - mountPath: /etc/pki/
-            name: nginxCerts
+            name: nginx-certs
             readOnly: true
-      - image: kerolosayman308/golang:simple-admission-webhook
+      - image: kerolosayman308/golang:simple-admission-webhook-1.0
         name: golang
         resources: 
           requests:
